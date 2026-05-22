@@ -1,0 +1,171 @@
+version: 2
+
+# ── Project ───────────────────────────────────────────────────────────────────
+project_name: helm-oci
+
+before:
+  hooks:
+    - go mod tidy
+    - go mod verify
+
+# ── Build ─────────────────────────────────────────────────────────────────────
+builds:
+  - id: helm-oci
+    main: .
+    binary: helm-oci
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    # Exclude unsupported combinations.
+    ignore:
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+    flags:
+      - -trimpath
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+# ── Archives ──────────────────────────────────────────────────────────────────
+# Each archive must unpack as helm-oci/<files> so that install-binary.sh can do:
+#   tar xzf helm-oci-linux-amd64.tgz
+# and find helm-oci/bin/helm-oci, helm-oci/plugin.yaml, helm-oci/install-binary.sh.
+# wrap_in_directory names the top-level directory after the archive name_template;
+# since we want "helm-oci" (not the versioned archive name) we set it explicitly.
+archives:
+  - id: helm-oci
+    ids:
+      - helm-oci
+    formats: ["tgz"]
+    name_template: "helm-oci-{{ .Os }}-{{ .Arch }}"
+    # Wraps all archive contents inside a "helm-oci/" directory, which is what
+    # install-binary.sh expects when it untars the downloaded archive.
+    wrap_in_directory: "helm-oci"
+    # Windows gets a zip so PowerShell users can expand it natively; the inner
+    # directory layout remains the same.
+    format_overrides:
+      - goos: windows
+        formats: ["zip"]
+    # Include the plugin manifest and install hook alongside the binary so the
+    # archive is a self-contained Helm plugin directory.
+    files:
+      - plugin.yaml
+      - install-binary.sh
+      - README.md
+      - LICENSE.md
+
+# ── Checksums ─────────────────────────────────────────────────────────────────
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+  algorithm: sha256
+
+# ── Signing ───────────────────────────────────────────────────────────────────
+# GoReleaser signs the checksum file (and therefore transitively covers all
+# platform archives) using the GPG key supplied via CI secrets.
+# Helm-native provenance (.prov) files are produced by a post-GoReleaser CI
+# step using `helm plugin package --sign` and verified with `helm plugin verify`
+# before being uploaded to the GitHub Release alongside the GoReleaser archives.
+signs:
+  - id: gpg-sign
+    # Sign only the checksum file; individual archives are covered by it.
+    artifacts: checksum
+    args:
+      - "--batch"
+      - "--yes"
+      - "--pinentry-mode"
+      - "loopback"
+      - "--passphrase"
+      - "{{ .Env.GPG_PASSPHRASE }}"
+      - "--local-user"
+      - "{{ .Env.GPG_KEY_ID }}"
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "--armor"
+      - "${artifact}"
+
+# ── GitHub Release ────────────────────────────────────────────────────────────
+release:
+  github:
+    owner: esnet
+    name: helm-oci
+  draft: false
+  prerelease: auto
+  name_template: "{{ .ProjectName }} {{ .Tag }}"
+  header: |
+    ## helm-oci {{ .Tag }}
+
+    Helm plugin that lets you bookmark OCI chart URLs and use them by name.
+
+    ### Install / upgrade
+
+    ```bash
+    helm plugin install https://github.com/esnet/helm-oci/releases/download/{{ .Tag }}/helm-oci-linux-amd64.tgz
+    ```
+
+    Or let Helm fetch the latest release automatically:
+
+    ```bash
+    helm plugin install https://github.com/esnet/helm-oci
+    ```
+  footer: |
+    **Full Changelog**: https://github.com/esnet/helm-oci/compare/{{ .PreviousTag }}...{{ .Tag }}
+
+    ### Verify
+
+    #### Using Helm (recommended, requires Helm 4)
+
+    Download the signed tarball and its provenance file for your platform, then verify:
+
+    ```bash
+    helm plugin verify oci-{{ .Version }}.tgz
+    ```
+
+    Import the signing key first if Helm reports an unknown key:
+
+    ```bash
+    gpg --import helm-oci-signing-key.asc
+    helm plugin verify oci-{{ .Version }}.tgz
+    ```
+
+    #### Using GPG + sha256sum
+
+    Import the signing key and verify the checksum file covers the GoReleaser archives:
+
+    ```bash
+    gpg --import helm-oci-signing-key.asc
+    gpg --verify {{ .ProjectName }}_{{ .Version }}_checksums.txt.asc {{ .ProjectName }}_{{ .Version }}_checksums.txt
+    sha256sum -c {{ .ProjectName }}_{{ .Version }}_checksums.txt
+    ```
+
+# ── Changelog ─────────────────────────────────────────────────────────────────
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "^ci:"
+      - Merge pull request
+      - Merge branch
+  groups:
+    - title: Features
+      regexp: "^.*feat.*:.*$"
+      order: 0
+    - title: Bug Fixes
+      regexp: "^.*fix.*:.*$"
+      order: 1
+    - title: Performance
+      regexp: "^.*perf.*:.*$"
+      order: 2
+    - title: Other
+      order: 999
