@@ -1,7 +1,7 @@
 apiVersion: v1
 type: cli/v1
 name: "oci"
-version: "1.0.0"
+version: "1.0.1"
 sourceURL: https://github.com/esnet/helm-oci
 runtime: subprocess
 config:

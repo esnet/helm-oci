@@ -18,7 +18,7 @@ A Helm plugin that adds local bookmarking for OCI-based Helm charts.
 ## Installing Helm-OCI
 
 ```sh
-helm plugin install https://github.com/esnet/helm-oci/releases/download/v1.0.0/oci-1.0.0.tgz
+helm plugin install https://github.com/esnet/helm-oci/releases/download/v1.0.1/oci-1.0.1.tgz
 ```
 
 ## Problem
