@@ -4,10 +4,10 @@ A Helm plugin that adds local bookmarking for OCI-based Helm charts.
 
 ## Table of Contents
 
+- [Installation](#installation)
 - [Problem](#problem)
 - [Solution](#solution)
-- [Installation](#installation)
-- [Commands](#commands)
+- [Usage](#usage)
   - [Managing Bookmarks](#managing-bookmarks)
   - [Inspecting Charts](#inspecting-charts)
   - [Installing and Managing Releases](#installing-and-managing-releases)
@@ -15,9 +15,9 @@ A Helm plugin that adds local bookmarking for OCI-based Helm charts.
 - [Development](#development)
 - [License](LICENSE.md)
 
-## Installation
+## Installing Helm-OCI
 
-```bash
+```sh
 helm plugin install https://github.com/esnet/helm-oci/releases/download/v1.0.0/oci-1.0.0.tgz
 ```
 
@@ -25,26 +25,26 @@ helm plugin install https://github.com/esnet/helm-oci/releases/download/v1.0.0/o
 
 Helm's traditional repository system lets you add a repo once and reference charts by short name:
 
-```
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install my-release bitnami/nginx
+```sh
+helm repo add jetstack https://charts.jetstack.io
+helm install jetstack/cert-manager cert-manager -n cert-manager --create-namespace
 ```
 
 OCI-based charts have no equivalent. Every install, upgrade, or inspect requires the full OCI URL:
 
-```
-helm install my-gateway oci://docker.io/envoyproxy/gateway-helm --version 1.3.0
-helm show values oci://docker.io/envoyproxy/gateway-helm --version 1.3.0
-helm upgrade my-gateway oci://docker.io/envoyproxy/gateway-helm --version 1.4.0
+```sh
+helm install envoy-gateway oci://docker.io/envoyproxy/gateway-helm --version 1.8.0
+helm show values oci://docker.io/envoyproxy/gateway-helm --version 1.7.0
+helm upgrade envoy-gateway oci://docker.io/envoyproxy/gateway-helm --version 1.8.0
 ```
 
-When managing multiple OCI charts across clusters, remembering and retyping these URLs becomes impractical.
+When managing multiple OCI charts across clusters, remembering and retyping these URLs becomes impractical and cumbersome.
 
 ## Solution
 
 `helm-oci` is a Helm plugin which solves this UX problem and lets you bookmark OCI chart URLs and reference them by name.
 
-```
+```sh
 ❯ helm oci
 Manage local bookmarks for OCI-based Helm charts.
 
@@ -67,7 +67,6 @@ Available Commands:
   upgrade     Upgrade a release using a bookmarked OCI chart
   values      Show values for a bookmarked OCI chart
   versions    List available versions for a bookmarked OCI chart
-
 ```
 
 ## Usage
