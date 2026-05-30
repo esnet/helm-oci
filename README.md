@@ -2,6 +2,8 @@
 
 A Helm plugin that adds local bookmarking for OCI-based Helm charts.
 
+![helm-oci demo](assets/preview.gif)
+
 ## Table of Contents
 
 - [Installation](#installation)
