@@ -6,7 +6,7 @@ A Helm plugin that adds local bookmarking for OCI-based Helm charts.
 
 ## Table of Contents
 
-- [Installation](#installation)
+- [Install](#install)
 - [Problem](#problem)
 - [Solution](#solution)
 - [Usage](#usage)
@@ -17,7 +17,7 @@ A Helm plugin that adds local bookmarking for OCI-based Helm charts.
 - [Development](#development)
 - [License](LICENSE.md)
 
-## Installing Helm-OCI
+## Install
 
 ```sh
 helm plugin install https://github.com/esnet/helm-oci/releases/download/v1.0.1/oci-1.0.1.tgz
@@ -35,8 +35,8 @@ helm install jetstack/cert-manager cert-manager -n cert-manager --create-namespa
 OCI-based charts have no equivalent. Every install, upgrade, or inspect requires the full OCI URL:
 
 ```sh
-helm install envoy-gateway oci://docker.io/envoyproxy/gateway-helm --version 1.8.0
-helm show values oci://docker.io/envoyproxy/gateway-helm --version 1.7.0
+helm install envoy-gateway oci://docker.io/envoyproxy/gateway-helm --version 1.7.0
+helm show values oci://docker.io/envoyproxy/gateway-helm --version 1.8.0
 helm upgrade envoy-gateway oci://docker.io/envoyproxy/gateway-helm --version 1.8.0
 ```
 
@@ -106,15 +106,15 @@ helm oci values <name> [--version <version>]
 ```bash
 # Install a chart
 helm oci install <name> <release> [--version <version>] [helm flags...]
-helm oci install envoy-gw my-gateway --version 1.3.0 --namespace envoy --create-namespace
+helm oci install envoy-gw my-gateway --version 1.7.0 --namespace envoy --create-namespace
 
 # Upgrade a release
 helm oci upgrade <name> <release> [--version <version>] [helm flags...]
-helm oci upgrade envoy-gw my-gateway --version 1.4.0
+helm oci upgrade envoy-gw my-gateway --version 1.8.0
 
 # Render templates locally
 helm oci template <name> <release> [--version <version>] [helm flags...]
-helm oci template envoy-gw my-gateway --version 1.3.0 --set foo=bar
+helm oci template envoy-gw my-gateway --version 1.8.0 --set foo=bar
 
 # Pull chart archive to local directory
 helm oci pull <name> [--version <version>]
