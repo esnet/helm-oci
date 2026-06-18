@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/kagraw/helm-oci/pkg/bookmark"
+	"github.com/esnet/helm-oci/pkg/bookmark"
 	"github.com/spf13/cobra"
 )
 

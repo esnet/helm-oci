@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/kagraw/helm-oci/pkg/registry"
+	"github.com/esnet/helm-oci/pkg/registry"
 	"github.com/spf13/cobra"
 )
 
