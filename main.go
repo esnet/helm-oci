@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kagraw/helm-oci/cmd"
+	"github.com/esnet/helm-oci/cmd"
 )
 
 func main() {
