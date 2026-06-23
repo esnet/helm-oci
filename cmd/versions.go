@@ -9,9 +9,10 @@ import (
 
 func newVersionsCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "versions <name>",
-		Short: "List available versions for a bookmarked OCI chart",
-		Args:  cobra.ExactArgs(1),
+		Use:               "versions <name>",
+		Short:             "List available versions for a bookmarked OCI chart",
+		Args:              cobra.ExactArgs(1),
+		ValidArgsFunction: completeBookmarkNames,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			b, err := getStore().Get(args[0])
 			if err != nil {

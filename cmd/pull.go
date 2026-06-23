@@ -10,6 +10,7 @@ func newPullCmd() *cobra.Command {
 		Short:              "Pull a bookmarked OCI chart",
 		Args:               cobra.MinimumNArgs(1),
 		DisableFlagParsing: true,
+		ValidArgsFunction:  completeBookmarkNames,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name, extra := args[0], args[1:]
 			b, err := getStore().Get(name)

@@ -10,6 +10,7 @@ func newTemplateCmd() *cobra.Command {
 		Short:              "Render templates for a bookmarked OCI chart",
 		Args:               cobra.MinimumNArgs(2),
 		DisableFlagParsing: true,
+		ValidArgsFunction:  completeBookmarkNames,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name, release, extra := args[0], args[1], args[2:]
 			b, err := getStore().Get(name)
